@@ -1,0 +1,14 @@
+.home__bg {
+    background-image: url('../../assets/plato-esquisito.avif');
+    height: 80vh;
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+    overflow-x: hidden;
+    border-radius: .5rem;
+}
+
+.home-message-icon {
+    margin-left: 10px;
+    display: inline-block;
+}
