@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
-import { Col, Row, Container, Form, Button } from 'react-bootstrap';
+import { Col, Container, Form, Row, Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
-import "./Signup.css";
-import botImg from '../../assets/bot.jpeg'
+import './Signup.css';
+import botImg from '../../assets/bot.jpeg';
 
 const Signup = () => {
   const [email, setEmail] = useState('');
@@ -14,26 +14,39 @@ const Signup = () => {
   const [uploadingImg, setUploadingImg] = useState(false);
   const [imagePreview, setImagePreview] = useState(null);
 
-  // validate img (png, jpg)
   function validateImg(e) {
     const file = e.target.files[0];
-    if (file.size >= 1048578) {
-      return alert('Max file size is 1mb');
+    if (file.size >= 1048576) {
+      return alert("Max file size is 1mb");
     } else {
       setImage(file);
       setImagePreview(URL.createObjectURL(file));
     }
   }
 
-  async function uploadImage(){
+  async function uploadImage() {
     const data = new FormData();
     data.append('file', image);
-    data.append('upload_preset', '17bcejcu');
+    data.append('upload_preset', 'dbbzk99pj');
+    try {
+      setUploadingImg(true);
+      let res = await fetch('https://api.cloudinary.com/v1_1/dbbzk99pj/image/upload', {
+        method: 'post',
+        body: data
+      });
+      const urlData = await res.json();
+      setUploadingImg(false);
+      return urlData.url
+    } catch (error) {
+      setUploadingImg(false);
+      const url = await uploadImage(image);
+      console.log(url);
+    }
   }
 
-  async function handleSignup (e) {
+  async function handleSignup(e) {
     e.preventDefault();
-    if(!image) return alert('Please upload your profile picture');
+    if (!image) return alert('Please upload your profile picture');
     const url = await uploadImage(image);
     console.log(url);
   }
@@ -41,37 +54,28 @@ const Signup = () => {
   return (
     <Container>
       <Row>
-        <Col md={7} className='d-flex align-items-center justify-content-center flex-direction-column'>
-          {/* form signup */}
-          <Form style={{ width: "80%", maxWidth: 500 }} onSubmit={handleSignup}>
-            <h1 className='text-center' >Create account</h1>
-
-            {/* Box of image profile */}
-            <div className='signup-profile-pic__container'>
-              <img src={imagePreview || botImg} className="signup-profile-pic" />
+        <Col md={7} className="d-flex align-center justify-content-center flex-direction-column">
+          <Form style={{ width: '80%', maxWidth: 500 }} onSubmit={handleSignup}>
+            <h1 className='text-center'>Create account</h1>
+            <div className='signup-profile-pic_container'>
+              <img src={imagePreview || botImg} className='signup-profile-pic' />
               <label htmlFor="image-upload" className="image-upload-label">
-                <i className="fas fa-plus-circle add-picture-icon"></i>
+                <i className='fas fa-plus-circle add-picture-icon'></i>
               </label>
-              {/* change image profile */}
-              <input type="file" id='image_upload' hidden accept='image/png image/jpg' onChange={validateImg} />
+              <input type='file' id="image-upload" hidden accept="image/png, image/jpeg" onClick={validateImg} />
             </div>
 
-            {/* name */}
+            {/* Name */}
             <Form.Group className="mb-3" controlId="formBasicName">
               <Form.Label>Name</Form.Label>
-              <Form.Control type="text" placeholder="Your Name" onChange={(e) => setName(e.target.value)} value={name} />
-              <Form.Text className="text-muted">
-                We'll never share your email with anyone else.
-              </Form.Text>
+              <Form.Control type="text" placeholder="Your name" onChange={(e) => setName(e.target.value)} value={name} />
             </Form.Group>
 
-            {/* email */}
+            {/* Email */}
             <Form.Group className="mb-3" controlId="formBasicEmail">
               <Form.Label>Email address</Form.Label>
               <Form.Control type="email" placeholder="Enter email" onChange={(e) => setEmail(e.target.value)} value={email} />
-              <Form.Text className="text-muted">
-                We'll never share your email with anyone else.
-              </Form.Text>
+              <Form.Text className="text-muted">We'll never share your email with anyone else.</Form.Text>
             </Form.Group>
 
             {/* password */}
@@ -80,22 +84,21 @@ const Signup = () => {
               <Form.Control type="password" placeholder="Password" onChange={(e) => setPassword(e.target.value)} value={password} />
             </Form.Group>
 
+            {/* Botón crear cuenta */}
             <Button variant="primary" type="submit">
               Create account
             </Button>
-
-            {/* preview login */}
-            <div className='py-4'>
-              <p className='text-content'>
+            <div className="py-4">
+              <p className="text-center">
                 Already have an account ? <Link to="/login">Login</Link>
               </p>
             </div>
           </Form>
         </Col>
 
-        <Col md={5} className='signup__bg'></Col>
+        <Col md={5} className="signup__bg"></Col>
       </Row>
-    </Container >
+    </Container>
   );
 }
 
